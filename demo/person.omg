@@ -1,0 +1,23 @@
+version 1.0
+
+# Import match lists
+import "name_prefix.txt" as prefix with word-boundary
+import "names.txt" as given_name with word-boundary
+import "surnames.txt" as surname with word-boundary
+import "name_suffix.txt" as suffix with word-boundary
+
+# Configure the default resolver
+resolver default uses exact with ignore-case, ignore-punctuation
+
+# Top-level rule for matching a person's name
+person = ( [[prefix]] \s{1,4} )? \
+    [[given_name]] ( \s{1,4} [[given_name]] )? ( \s{1,4} \w | \s{1,4} \w "." )? \
+    \s{1,4} [[surname]] \
+    (\s{0,4} "," \s{1,4} [[suffix]])? \
+    uses default resolver with optional-tokens("person-opt_tokens.txt")
+
+# Dotted-rule references resolve to top-level person matches
+person.prefix_surname = [[prefix]] \s{1,4} [[surname]] (\s{0,4} "," \s{1,4} [[suffix]])? \
+    uses default resolver with optional-tokens("person-opt_tokens.txt")
+person.surname = [[surname]] (\s{0,4} "," \s{1,4} [[suffix]])? \
+    uses default resolver with optional-tokens("person-opt_tokens.txt")

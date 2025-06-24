@@ -1,0 +1,76 @@
+Adm.
+Agency Officer
+Agent
+Agent
+Ambassador
+Attorney General
+Bishop
+Br.
+Br. Gen.
+Brig. Gen.
+Capt.
+Cardinal
+Chairman
+Chancellor
+Chief
+Col.
+Congressman
+Congresswoman
+Cpl.
+Crown Prince
+Czar
+Dame
+Director
+Dr.
+Emperor
+Fr.
+Gen.
+Gov.
+Governor
+Her Excellency
+His Holiness
+Secretary of War
+Hon.
+Imam
+Judge
+Justice
+King
+Lady
+Library Archivist
+Lord
+Lt.
+Lt. Col.
+Lt. Gen.
+Lt. Gov.
+Maj.
+Maj. Gen.
+Master
+Miss
+Monsignor
+Mr.
+Mrs.
+Ms.
+Mx.
+Officer
+Pr.
+Premier
+Pres.
+President
+President-elect
+Prince
+Prof.
+Pvt.
+Queen
+Rabbi
+Rep.
+Rev.
+Secretary
+Sen.
+Senator
+Senior Staff Assistant
+Sgt.
+Sheikh
+Sir
+Sr.
+Staff Assistant
+Vice President

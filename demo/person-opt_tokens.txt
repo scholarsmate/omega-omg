@@ -1,0 +1,102 @@
+Adm
+Agent
+Ambassador
+Attorney General
+Bishop
+Br Gen
+Br
+Brig Gen
+Capt
+Cardinal
+Chairman
+Chancellor
+Chief
+Col
+Congressman
+Congresswoman
+Cpl
+Crown Prince
+Czar
+Dame
+Director
+Dr
+Emperor
+Fr
+Gen
+General
+Gov
+Governor
+Her Excellency
+His Holiness
+Hon
+II
+III
+Imam
+IV
+Jr
+Judge
+Justice
+King
+Lady
+Lord
+Lt Col
+Lt Gen
+Lt Gov
+Lt
+Maj Gen
+Maj
+Master
+Miss
+Monsignor
+Mr
+Mrs
+Ms
+Mx
+Pr
+Premier
+Pres
+President
+President-elect
+Prince
+Prof
+Pvt
+Queen
+Rabbi
+Rep
+Rev
+Secretary
+Sen
+Senator
+Senior Staff Assistant
+Sgt
+Sheikh
+Sir
+Sr
+Staff Assistant
+Vice President
+A
+B
+C
+D
+E
+F
+G
+H
+I
+J
+K
+L
+M
+N
+O
+P
+Q
+R
+S
+T
+U
+V
+W
+X
+Y
+Z

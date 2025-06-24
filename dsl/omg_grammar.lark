@@ -1,0 +1,106 @@
+// Top-level rule must start with a version declaration, followed by import statements and rule definitions.
+root: version_stmt import_stmt+ resolver_default? rule_def+
+
+// === Version Declaration ===
+version_stmt: "version" VERSION_LITERAL
+
+// === Imports ===
+import_stmt: "import" STRING "as" IDENT import_opts?
+
+import_opts: "with" import_flag ("," import_flag)*
+IMPORT_FLAG: "ignore-case" | "ignore-punctuation" | "elide-whitespace" | "word-boundary"
+import_flag: IMPORT_FLAG
+
+// === Default Resolver ===
+resolver_default: "resolver" "default" "uses" uses_clause NEWLINE?
+
+// === Rules ===
+rule_def: IDENT EQUAL expr uses_clause? NEWLINE?
+
+// === Resolver Clauses ===
+uses_clause: "uses" resolver_scope? resolver_method resolver_with?
+resolver_scope: "resolver" | "default" "resolver"
+resolver_method: IDENT ("(" resolver_arg_list ")")?
+resolver_arg_list: resolver_arg ("," resolver_arg)*
+resolver_arg: IDENT "=" STRING | STRING
+resolver_with: "with" resolver_flag ("," resolver_flag)*
+resolver_flag: "ignore-case" | "ignore-punctuation" | optional_tokens_clause
+optional_tokens_clause: "optional-tokens" "(" STRING ("," STRING)* ")"
+
+// === Expressions ===
+?expr: alt
+
+?alt: concat ("|" concat)*         -> alt
+?concat: quantified_expr+          -> concat
+
+?quantified_expr: primary_expr quantifier? -> quantified
+
+?primary_expr: group_expr
+             | named_capture
+             | list_match
+             | regex_atom
+
+group_expr: LPAR expr RPAR
+
+named_capture: NAMED_CAP_OPEN IDENT GT expr RPAR
+list_match: "[[" IDENT [ ":" filter_expr ] "]]"
+
+filter_expr: IDENT LPAR STRING RPAR
+
+// === Quantifiers ===
+quantifier: qmark
+          | range
+
+qmark: QMARK
+range: LBRACE INT RBRACE           -> exact_range
+     | LBRACE INT COMMA INT RBRACE -> range
+
+// === Atoms ===
+?regex_atom: escape
+           | anchor
+           | dot
+           | charclass
+           | string
+           | IDENT
+
+escape: ESCAPE
+anchor: CARET -> anchor
+      | DOLLAR -> anchor
+
+dot: DOT
+string: STRING
+
+charclass: "[" charclass_items "]"
+charclass_items: charclass_item+
+charclass_item: CHAR_RANGE | ESCAPE | /[^\\\]]/
+
+// === Tokens ===
+VERSION_LITERAL: /[0-9]+\.[0-9]+/
+CHAR_RANGE: LETTER "-" LETTER
+ESCAPE: /\\[dDsSwWbB\\\]\[-]/
+LETTER: /[a-zA-Z]/
+IDENT: /[a-zA-Z0-9_]+\.?[a-zA-Z0-9_]*/
+STRING: /"[^"]*"/
+INT: /\d+/
+LINE_CONTINUATION: /\\\r?\n/
+
+EQUAL: "="
+QMARK: "?"
+DOT: "."
+LBRACE: "{"
+RBRACE: "}"
+COMMA: ","
+LPAR: "("
+RPAR: ")"
+LSQB: "["
+NAMED_CAP_OPEN: "(?P<"
+GT: ">"
+CARET: "^"
+DOLLAR: "$"
+
+// === Whitespace & Comments ===
+%import common.NEWLINE
+%import common.WS
+%ignore WS
+%ignore LINE_CONTINUATION
+%ignore /#[^\n]*/
