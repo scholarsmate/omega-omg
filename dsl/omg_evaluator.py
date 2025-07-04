@@ -141,6 +141,10 @@ class RuleEvaluator:
                 ip = "ignore-punctuation" in flags
                 ew = "elide-whitespace" in flags
                 wb = "word-boundary" in flags
+                wp = "word-prefix" in flags
+                ws = "word-suffix" in flags
+                ls = "line-start" in flags
+                le = "line-end" in flags
 
                 # Compile patterns from file
                 Compiler.compile_from_filename(
@@ -160,9 +164,13 @@ class RuleEvaluator:
                 ) as matcher:
                     external_results = matcher.match(
                         self.haystack,
-                        no_overlap=True,
-                        longest_only=True,
+                        no_overlap=True,   # No overlapping matches for OMG
+                        longest_only=True, # Longest match only for OMG
                         word_boundary=wb,
+                        word_prefix=wp,
+                        word_suffix=ws,
+                        line_start=ls,
+                        line_end=le,
                     )
                     # Convert external MatchResult objects to our internal ones
                     internal_results = [

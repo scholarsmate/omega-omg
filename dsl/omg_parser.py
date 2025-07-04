@@ -36,9 +36,13 @@ RE_VALID_FLAGS = {
     "ignore-punctuation",
     "elide-whitespace",
     "word-boundary",
+    "word-prefix",
+    "word-suffix",
+    "line-start",
+    "line-end",
 }
 RE_EXTRACT_FLAGS = re.compile(
-    r"\b(?:ignore-case|ignore-punctuation|elide-whitespace|word-boundary)\b"
+    r"\b(?:ignore-case|ignore-punctuation|elide-whitespace|word-boundary|word-prefix|word-suffix|line-start|line-end)\b"
 )
 
 
