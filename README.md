@@ -5,7 +5,7 @@ OmegaOMG is a domain-specific language (DSL) and runtime engine for defining and
 ## Features
 
 - **Expressive DSL syntax**: Write rules using named list matches, literals, escapes, concatenation, alternation, and bounded quantifiers.
-- **Pre-anchored matching**: Integrates with `OmegaMatch` to obtain longest, non-overlapping match streams for each alias.
+- **Pre-anchored matching**: Integrates with [OmegaMatch](https://github.com/scholarsmate/omega-match) to obtain longest, non-overlapping match streams for each alias.
 - **AST-based evaluation**: Transforms parsed rules into an abstract syntax tree (AST), then evaluates with caching and fast-path optimizations.
 - **Customizable resolvers**: Attach default or per-rule resolver configurations for entity enrichment (e.g., dates, numbers, custom tokens).
 - **Performance optimizations**:
