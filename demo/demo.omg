@@ -6,7 +6,7 @@ import "names.txt" as given_name with word-boundary
 import "surnames.txt" as surname with word-boundary
 import "name_suffix.txt" as suffix with word-boundary
 import "0000-9999.txt" as 4_digits with word-boundary
-import "tlds.txt" as tld with word-boundary, ignore-case
+import "tlds.txt" as tld with word-suffix, ignore-case
 
 # Configure the default resolver
 resolver default uses exact with ignore-case, ignore-punctuation
@@ -31,4 +31,4 @@ phone = "(" \s{0,2} \d{3} \s{0,2} ")" \s{0,2} \d{3} "-" \s{0,2} [[4_digits]]
 # Pattern: username@domain.tld
 # Username: 1-64 chars (alphanumeric, dots, hyphens, underscores)
 # Domain: 1-253 chars total, each label 1-63 chars
-email = [a-zA-Z0-9._-]{1,64} "@" [a-zA-Z0-9-]{1,63} ("." [a-zA-Z0-9-]{1,63}){0,10} "." [[tld]]
+email = [a-zA-Z0-9._-]{1,64} "@" [a-zA-Z0-9-]{1,63} ("." [a-zA-Z0-9-]{1,63}){0,10} [[tld]]

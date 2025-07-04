@@ -8,7 +8,7 @@ version_stmt: "version" VERSION_LITERAL
 import_stmt: "import" STRING "as" IDENT import_opts?
 
 import_opts: "with" import_flag ("," import_flag)*
-IMPORT_FLAG: "ignore-case" | "ignore-punctuation" | "elide-whitespace" | "word-boundary"
+IMPORT_FLAG: "ignore-case" | "ignore-punctuation" | "elide-whitespace" | "word-boundary" | "word-prefix" | "word-suffix" | "line-start" | "line-end"
 import_flag: IMPORT_FLAG
 
 // === Default Resolver ===

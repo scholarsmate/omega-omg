@@ -14,6 +14,7 @@ OmegaOMG is a domain-specific language (DSL) and runtime engine for defining and
   - Binary-search anchoring and greedy extension for list matches
   - Adaptive sampling for quantifier anchors
 - **Zero external dependencies** aside from standard Python libraries and `lark` / `omega_match`.
+- **VSCode Intelisense**: Visual Studio Code OMG Intelisense provided by [OMG Language Support](https://github.com/scholarsmate/omega-omg-vscode)
 
 ## Installation
 
