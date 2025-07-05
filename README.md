@@ -1,5 +1,9 @@
 # OmegaOMG: Omega Object Matching Grammar is a high-performance rule-based object matcher
 
+<p align="center">
+  <img src="images/icon.svg" alt="OmegaOMG Logo" width=180/>
+</p>
+
 OmegaOMG is a domain-specific language (DSL) and runtime engine for defining and evaluating complex matching rules against large byte-based inputs (“haystacks”). It leverages pre-anchored pattern matches (via the `OmegaMatch` library), advanced AST-based evaluation, and customizable entity resolution to deliver efficient, reliable object extraction pipelines.
 
 ## Features
