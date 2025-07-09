@@ -31,14 +31,23 @@ OmegaOMG is a domain-specific language (DSL) and runtime engine for defining and
 
 2. Create and activate a Python virtual environment:
 
+   a. Windows:
+
    ```powershell
-   python -m venv .venv
+   python3.exe -m venv .venv
    .\.venv\Scripts\Activate.ps1
    ```
 
-3. Install requirements:
+   b. *nix and macOS:
 
-   ```powershell
+   ```sh
+   python3 -m venv .venv
+   source ./.venv/bin/activate
+   ```
+
+3. In the activated environment, install requirements:
+
+   ```shell
    pip install -r requirements.txt
    ```
 
@@ -104,7 +113,7 @@ for m in matches:
 
 ### 3. Command-Line Tool
 
-A command-line interface for batch processing is provided in `omg.py`. Run `python omg.py --help` for options.
+A command-line interface for batch processing is provided by `omg.py`. Run `python omg.py --help` for options.
 
 #### Demo: End-to-End Object Matching and Highlighting
 
@@ -113,14 +122,14 @@ The following demonstrates how to use the CLI tools to extract and visualize mat
 1. **Run the matcher and output results to JSON:**
 
    ```powershell
-   python .\omg.py --show-stats --show-timing --output matches.json .\demo\demo.omg .\demo\CIA_Briefings_of_Presidential_Candidates_1952-1992.txt
+   python omg.py --show-stats --show-timing --output matches.json .\demo\demo.omg .\demo\CIA_Briefings_of_Presidential_Candidates_1952-1992.txt
    ```
    This command will print timing and statistics to the terminal and write all matches to `matches.json` in UTF-8 with LF line endings.
 
 2. **Render the matches as highlighted HTML:**
 
    ```powershell
-   python .\highlighter.py .\demo\CIA_Briefings_of_Presidential_Candidates_1952-1992.txt .\matches.json CIA_demo.html
+   python highlighter.py .\demo\CIA_Briefings_of_Presidential_Candidates_1952-1992.txt matches.json CIA_demo.html
    ```
    This will generate an HTML file (`CIA_demo.html`) with all matched objects highlighted for easy review.
 
