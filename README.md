@@ -4,6 +4,16 @@
   <img src="images/icon.svg" alt="OmegaOMG Logo" width=180/>
 </p>
 
+<p align="center">
+   <a href="https://github.com/scholarsmate/omega-omg/actions/workflows/ci.yml">
+      <img alt="CI" src="https://github.com/scholarsmate/omega-omg/actions/workflows/ci.yml/badge.svg" />
+   </a>
+   <a href="https://codecov.io/gh/scholarsmate/omega-omg">
+      <img alt="Coverage" src="https://codecov.io/gh/scholarsmate/omega-omg/branch/main/graph/badge.svg" />
+   </a>
+  
+</p>
+
 OmegaOMG is a domain-specific language (DSL) and runtime engine for defining and evaluating high‑performance object / entity matching rules against large byte-based inputs (“haystacks”). It leverages pre‑anchored longest, non‑overlapping pattern matches (via the [`OmegaMatch`](https://github.com/scholarsmate/omega-match) library), an optimized AST evaluation engine, and a modular entity resolution pipeline to produce clean, canonicalized, and enriched match streams.
 
 ## Key Features
