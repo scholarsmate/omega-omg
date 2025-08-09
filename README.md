@@ -11,6 +11,12 @@
    <a href="https://codecov.io/gh/scholarsmate/omega-omg">
       <img alt="Coverage" src="https://codecov.io/gh/scholarsmate/omega-omg/branch/main/graph/badge.svg" />
    </a>
+   <a href="https://pypi.org/project/omega-omg/">
+      <img alt="PyPI" src="https://img.shields.io/pypi/v/omega-omg.svg?label=PyPI&logo=pypi" />
+   </a>
+   <a href="https://pypi.org/project/omega-omg/">
+      <img alt="Python Versions" src="https://img.shields.io/pypi/pyversions/omega-omg.svg" />
+   </a>
   
 </p>
 
