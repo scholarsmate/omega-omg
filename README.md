@@ -17,6 +17,9 @@
    <a href="https://pypi.org/project/omega-omg/">
       <img alt="Python Versions" src="https://img.shields.io/pypi/pyversions/omega-omg.svg" />
    </a>
+   <a href="https://github.com/scholarsmate/omega-omg/pkgs/container/omega-omg">
+      <img alt="GHCR" src="https://img.shields.io/badge/ghcr-latest-blue?logo=github" />
+   </a>
   
 </p>
 
@@ -98,19 +101,49 @@ Requires: Python 3.9+ (uses builtin generics like tuple[str, ...]).
    pytest -q
    ```
 
-   ### Docker (optional)
+    ### Docker (optional)
 
-   Build a minimal image for deployment or ad‑hoc runs:
+    Prebuilt image (GHCR):
 
-   ```bash
-   docker build -t omega-omg:latest .
-   ```
+    - Pull the image (multi‑arch: amd64/arm64):
 
-   Run the CLI inside the container (mount your working dir):
+       ```bash
+       docker pull ghcr.io/scholarsmate/omega-omg:latest
+       ```
 
-   ```bash
-   docker run --rm -v "$PWD:/work" -w /work omega-omg:latest python omg.py --help
-   ```
+    - Run with your workspace mounted (ENTRYPOINT already runs omg.py):
+
+       ```bash
+       docker run --rm -v "$PWD:/work" -w /work ghcr.io/scholarsmate/omega-omg:latest --help
+       ```
+
+    - Example (Linux/macOS) end‑to‑end run with output:
+
+       ```bash
+       docker run --rm -v "$PWD:/work" -w /work ghcr.io/scholarsmate/omega-omg:latest \
+          --show-stats --show-timing --output matches.json \
+          ./demo/demo.omg ./demo/CIA_Briefings_of_Presidential_Candidates_1952-1992.txt
+       ```
+
+    - Example (Windows PowerShell):
+
+       ```powershell
+       docker run --rm -v "${PWD}:/work" -w /work ghcr.io/scholarsmate/omega-omg:latest \
+          --show-stats --show-timing --output matches.json \
+          ./demo/demo.omg ./demo/CIA_Briefings_of_Presidential_Candidates_1952-1992.txt
+       ```
+
+    Notes:
+    - Inside the Linux container, use POSIX‑style paths (forward slashes), even on Windows.
+    - The image includes the native OpenMP runtime (libgomp) required by omega_match.
+    - Versioned tags are published on release, e.g.: `ghcr.io/scholarsmate/omega-omg:v0.2.1`.
+
+    Build locally instead:
+
+    ```bash
+    docker build -t omega-omg:latest .
+    docker run --rm -v "$PWD:/work" -w /work omega-omg:latest --help
+    ```
 
 ## Usage
 
