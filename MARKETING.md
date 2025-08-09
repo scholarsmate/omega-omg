@@ -97,7 +97,7 @@ person = [[given_name]] ( \s{1,4} [[given_name]] ){0,2} ( \s{1,4} \w | \s{1,4} \
 
 - CLI: `omg.py` for batch extraction and JSON output
 - Python API: programmatic parsing and evaluation (`dsl.omg_parser`, `dsl.omg_evaluator`)
-- VS Code: syntax highlighting, IntelliSense (link in README)
+- VS Code extension: [OMG Language Support](https://github.com/scholarsmate/omega-omg-vscode) for syntax highlighting & IntelliSense
 - List matching engine: powered by [OmegaMatch](https://github.com/scholarsmate/omega-match)
  - Highlighter: render interactive HTML from matches (`highlighter.py`)
 
