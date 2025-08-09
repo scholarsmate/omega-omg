@@ -186,6 +186,7 @@ docker run --rm -v "$PWD:/work" -w /work omega-omg:latest --help
 ### 1. Define a DSL file
 
 Create a `.omg` file with rules, e.g., `demo/demo.omg`:
+> Tip: In VS Code, install the OmegaOMG Language Support extension, then open `demo/demo.omg` to get syntax highlighting and completion.
 ```dsl
 version 1.0
 
@@ -272,6 +273,8 @@ Version information:
 #### Demo: End-to-End Object Matching and Highlighting
 
 The following demonstrates how to use the CLI tools to extract and visualize matches from a text file using a demo OMG rule set:
+
+> Tip: In VS Code, install the OmegaOMG Language Support extension, then open `demo/demo.omg` for syntax highlighting and completion while you explore the rules.
 
 1. **Run the matcher and output results to JSON (line‑delimited):**
 
