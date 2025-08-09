@@ -1,0 +1,350 @@
+Metadata-Version: 2.4
+Name: omega-omg
+Version: 0.2.0
+Summary: Omega Object Matching Grammar (OmegaOMG): DSL and engine for high-performance object/entity matching.
+Author: OmegaOMG Authors
+License:                                  Apache License
+                                   Version 2.0, January 2004
+                                http://www.apache.org/licenses/
+        
+           TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+        
+           Copyright 2025 Omega Development
+        
+           Licensed under the Apache License, Version 2.0 (the "License");
+           you may not use this file except in compliance with the License.
+           You may obtain a copy of the License at
+        
+               http://www.apache.org/licenses/LICENSE-2.0
+        
+           Unless required by applicable law or agreed to in writing, software
+           distributed under the License is distributed on an "AS IS" BASIS,
+           WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+           See the License for the specific language governing permissions and
+           limitations under the License.
+        
+Project-URL: Homepage, https://github.com/scholarsmate/omega-omg
+Project-URL: Repository, https://github.com/scholarsmate/omega-omg
+Project-URL: Issues, https://github.com/scholarsmate/omega-omg/issues
+Keywords: dsl,matching,entity-resolution,nlp,regex,omega
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Text Processing
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: lark
+Requires-Dist: omega_match
+Dynamic: license-file
+
+# OmegaOMG: Omega Object Matching Grammar
+
+<p align="center">
+  <img src="images/icon.svg" alt="OmegaOMG Logo" width=180/>
+</p>
+
+<p align="center">
+   <a href="https://github.com/scholarsmate/omega-omg/actions/workflows/ci.yml">
+      <img alt="CI" src="https://github.com/scholarsmate/omega-omg/actions/workflows/ci.yml/badge.svg" />
+   </a>
+   <a href="https://codecov.io/gh/scholarsmate/omega-omg">
+      <img alt="Coverage" src="https://codecov.io/gh/scholarsmate/omega-omg/branch/main/graph/badge.svg" />
+   </a>
+  
+</p>
+
+OmegaOMG is a domain-specific language (DSL) and runtime engine for defining and evaluating high‑performance object / entity matching rules against large byte-based inputs (“haystacks”). It leverages pre‑anchored longest, non‑overlapping pattern matches (via the [`OmegaMatch`](https://github.com/scholarsmate/omega-match) library), an optimized AST evaluation engine, and a modular entity resolution pipeline to produce clean, canonicalized, and enriched match streams.
+
+## Key Features
+
+- **Expressive DSL** (version `1.0`):
+   - `version 1.0` header (mandatory)
+   - `import "file.txt" as alias [with flags...]`
+   - Pattern atoms: literals, escapes (`\d \s \w` etc.), anchors `^ $`, dot `.`, character classes `[...]`, list matches `[[alias]]`, optional filters `[[alias:startsWith("A")]]`, named captures `(?P<name> ...)`.
+   - Operators: concatenation, alternation `|`, grouping `(...)`.
+   - Quantifiers: bounded `{m}`, `{m,n}`, and `?` (no unbounded `*` / `+` – enforced at runtime).
+   - Every rule must include at least one `ListMatch` anchor (validated).
+   - Dotted rule names (e.g. `person.surname`) supported for parent/child entity models.
+- **Import flags**: `ignore-case`, `ignore-punctuation`, `elide-whitespace`, `word-boundary`, `word-prefix`, `word-suffix`, `line-start`, `line-end` (forwarded to `omega_match`).
+- **Pre‑anchored matching**: Delegates raw token list detection to `omega_match` with `longest_only` & `no_overlap` guarantees per alias.
+- **Optimized AST evaluation**:
+   - Offset‑indexed & binary searched ListMatch anchors
+   - Greedy quantified ListMatch chaining
+   - Caching for pattern parts, prefix length, listmatch presence, unbounded checks
+   - Adaptive sampling of potential start offsets to dramatically reduce scan points
+- **Entity Resolution Pipeline** (see `RESOLUTION.md`): Implements Steps 1‑6
+   1. Validation & normalization
+   2. Overlap resolution with deterministic tie‑breaking
+   3. Tokenization + optional token filtering
+   4. Horizontal canonicalization (parent deduplication)
+   5. Vertical child resolution (child → parent referencing)
+   6. Metadata enrichment (sentence / paragraph boundaries)
+- **Resolver configuration**:
+   - `resolver default uses exact ...` sets a default for rules
+   - Per‑rule: `rule = ... uses resolver fuzzy(threshold="0.9") with ignore-case, optional-tokens("file.txt")`
+   - Parent rules without children skip resolution for speed; parents with children receive an automatic lightweight `boundary-only` resolver if not explicitly configured.
+- **Resolver methods**: Grammar accepts arbitrary resolver method identifiers; built-ins implemented are `exact` and `fuzzy(threshold=...)`. For parent canonicalization, unknown methods fall back to `exact`. For child resolution, use `exact` or `fuzzy` to guarantee matching; unknown methods may result in children being discarded. An internal `boundary-only` mode is used automatically for certain parent rules.
+- **Highlighter utility**: Renders enriched matches to interactive HTML (`highlighter.py`) with rule toggles and keyboard navigation (`n` / `p`).
+- **VS Code language integration**: See [OMG Language Support](https://github.com/scholarsmate/omega-omg-vscode) for syntax highlighting & IntelliSense.
+- **Lean dependencies**: Runtime requires only `lark` and `omega_match`.
+
+> For algorithmic details and performance rationale see: [`RESOLUTION.md`](RESOLUTION.md)
+
+## Installation
+
+Requires: Python 3.9+ (uses builtin generics like tuple[str, ...]).
+
+1. Clone this repository:
+
+   ```powershell
+   git clone https://github.com/scholarsmate/omega-omg.git
+   cd omega-omg
+   ```
+
+2. Create and activate a Python virtual environment:
+
+   a. Windows:
+
+   ```powershell
+   python3.exe -m venv .venv
+   .\.venv\Scripts\Activate.ps1
+   ```
+
+   b. *nix and macOS:
+
+   ```sh
+   python3 -m venv .venv
+   source ./.venv/bin/activate
+   ```
+
+3. Install runtime dependencies (and optionally dev tooling):
+
+   ```powershell
+   pip install -r requirements.txt
+   # For contributors / tests / linting
+   pip install -r requirements-dev.txt
+   ```
+
+4. (Optional) Run tests to verify environment:
+
+   ```powershell
+   pytest -q
+   ```
+
+## Usage
+
+### 1. Define a DSL file
+
+Create a `.omg` file with rules, e.g., `demo/demo.omg`:
+```dsl
+version 1.0
+
+# Import match lists
+import "name_prefix.txt" as prefix with word-boundary, ignore-case
+import "names.txt" as given_name with word-boundary
+import "surnames.txt" as surname with word-boundary
+import "name_suffix.txt" as suffix with word-boundary
+import "0000-9999.txt" as 4_digits with word-boundary
+import "tlds.txt" as tld with word-boundary, ignore-case
+
+# Configure the default resolver
+resolver default uses exact with ignore-case, ignore-punctuation
+
+# Top-level rule for matching a person's name
+person = ( [[prefix]] \s{1,4} )? \
+    [[given_name]] ( \s{1,4} [[given_name]] )? ( \s{1,4} \w | \s{1,4} \w "." )? \
+    \s{1,4} [[surname]] \
+    (\s{0,4} "," \s{1,4} [[suffix]])? \
+    uses default resolver with optional-tokens("person-opt_tokens.txt")
+
+# Dotted-rule references resolve to top-level person matches
+person.prefix_surname = [[prefix]] \s{1,4} [[surname]] (\s{0,4} "," \s{1,4} [[suffix]])? \
+    uses default resolver with optional-tokens("person-opt_tokens.txt")
+person.surname = [[surname]] (\s{0,4} "," \s{1,4} [[suffix]])? \
+    uses default resolver with optional-tokens("person-opt_tokens.txt")
+
+# Rule for matching a phone number
+phone = "(" \s{0,2} \d{3} \s{0,2} ")" \s{0,2} \d{3} "-" \s{0,2} [[4_digits]]
+
+# Rule for matching email addresses with bounded quantifiers
+# Pattern: username@domain.tld
+# Username: 1-64 chars (alphanumeric, dots, hyphens, underscores)
+# Domain: 1-253 chars total, each label 1-63 chars
+email = [A-Za-z0-9._-]{1,64} "@" [A-Za-z0-9-]{1,63} ("." [A-Za-z0-9-]{1,63}){0,10} "." [[tld]]
+```
+
+### 2. Parse and evaluate in Python
+
+```python
+from dsl.omg_parser import parse_file
+from dsl.omg_evaluator import RuleEvaluator
+
+# Load DSL and input haystack
+ast = parse_file("demo/demo.omg")
+with open("demo/CIA_Briefings_of_Presidential_Candidates_1952-1992.txt", "rb") as f:
+    haystack = f.read()
+
+# Evaluate a specific rule
+engine = RuleEvaluator(ast_root=ast, haystack=haystack)
+matches = engine.evaluate_rule(ast.rules["person"])
+for m in matches:
+    print(m.offset, m.match.decode())
+```
+
+### 3. Command-Line Tool
+
+A command-line interface is provided by `omg.py`.
+
+```powershell
+python omg.py --help
+```
+
+Common flags:
+
+| Flag | Purpose |
+|------|---------|
+| `--show-stats` | Emit resolution statistics (input vs output, stage timings) |
+| `--show-timing` | Show breakdown of file load, parse, evaluation, resolution |
+| `--no-resolve` | Skip entity resolution; emit raw rule matches |
+| `--pretty-print` | Emit a single JSON array instead of line-delimited JSON objects |
+| `--log-level LEVEL` | Adjust logging (default WARNING) |
+| `-o file.json` | Write JSON output to file (UTF‑8, LF) |
+| `--version` | Show component & DSL versions |
+
+Version output example:
+```
+Version information:
+   omega_match: <x.y.z>
+   omg: 0.2.0
+   DSL: 1.0
+```
+
+#### Demo: End-to-End Object Matching and Highlighting
+
+The following demonstrates how to use the CLI tools to extract and visualize matches from a text file using a demo OMG rule set:
+
+1. **Run the matcher and output results to JSON (line‑delimited):**
+
+   ```powershell
+   python omg.py --show-stats --show-timing --output matches.json .\demo\demo.omg .\demo\CIA_Briefings_of_Presidential_Candidates_1952-1992.txt
+   ```
+   This command will print timing and statistics to the terminal and write all matches to `matches.json` in UTF-8 with LF line endings.
+
+2. **Render the matches as highlighted HTML:**
+
+   ```powershell
+   python highlighter.py .\demo\CIA_Briefings_of_Presidential_Candidates_1952-1992.txt matches.json CIA_demo.html
+   ```
+   This will generate an HTML file (`CIA_demo.html`) with all matched objects highlighted for easy review.
+
+You can open the resulting HTML file in a browser to visually inspect the extracted matches.
+
+## Project Structure
+
+```
+omg.py               # CLI driver (evaluate + optional resolution + JSON output)
+highlighter.py       # Convert line-delimited match JSON to interactive HTML
+dsl/
+   omg_grammar.lark   # Lark grammar definition for DSL v1.0
+   omg_parser.py      # Parser + resolver clause extraction + version enforcement
+   omg_ast.py         # Immutable AST node dataclasses
+   omg_transformer.py # Grammar → AST transformer
+   omg_evaluator.py   # Optimized rule evaluation engine
+   omg_resolver.py    # Resolver façade (imports components below)
+   resolver/          # Entity resolution submodules (overlap, horizontal, vertical, tokenizer, metadata)
+demo/                # Example DSL + pattern lists + sample text
+tests/               # Comprehensive pytest suite
+RESOLUTION.md        # Detailed entity resolution algorithm spec
+```
+
+## DSL Constraints & Gotchas
+
+- All rules must include at least one `[[alias]]` (ListMatch). Pure literal / regex‑like rules are rejected.
+- Unbounded quantifiers (`*`, `+`) are disallowed; use `{0,n}` / `{1,n}` equivalents.
+- Quantified `ListMatch` chains are greedily extended with adjacency (no gaps) and optional line boundary enforcement.
+- Dotted (child) rules without an explicit resolver inherit the default; parents with children but no explicit resolver receive a lightweight `boundary-only` config to add structural metadata.
+- Import paths in a DSL file are resolved relative to that DSL file when relative.
+
+## Entity Resolution Summary
+
+After raw AST evaluation, resolution (unless `--no-resolve`) applies:
+
+1. Overlap removal (length > earlier offset > shorter rule name > lexical rule name).
+2. Parent canonicalization by normalized token bag (flags + optional tokens removed).
+3. Child rule validation: each child must map to exactly one canonical parent (else dropped).
+4. Metadata enrichment: sentence & paragraph boundary offsets.
+
+See `RESOLUTION.md` for full reasoning, complexity, and future extension recommendations.
+
+## Performance Notes
+
+- Matching cost reduced via adaptive anchor sampling and per‑alias offset maps.
+- Regex-like escapes use pre‑compiled single‑byte patterns for speed.
+- Caches (pattern part, prefix length, ListMatch presence, unbounded quantifier detection) materially cut repeated traversals.
+- Resolution skips unnecessary work (e.g., no resolver for isolated parent rules).
+
+## Development
+
+Formatting / linting (optional but recommended):
+
+```powershell
+ruff check .
+pylint dsl omg.py highlighter.py
+pytest --cov
+```
+
+Type checking:
+```powershell
+mypy dsl
+```
+
+Releasing (example):
+```powershell
+python -m build
+twine upload dist/*
+```
+
+## Troubleshooting
+
+| Issue | Likely Cause | Fix |
+|-------|--------------|-----|
+| `ValueError: Rule 'x' must include at least one list match` | Rule lacks `[[alias]]` | Add an import + list match anchor |
+| `Unsupported OMG DSL version` | DSL file version mismatch | Update `version 1.0` or engine constant |
+| No matches produced | Missing import flags (e.g. `word-boundary`) or list file path issue | Verify list file contents & flags |
+| Child rules disappear | Unresolved parent reference | Ensure corresponding parent rule matches same span |
+| HTML missing colors for a rule | Rule produced zero matches | Confirm JSON lines include that rule |
+
+## Roadmap (Planned / Potential)
+
+- Plugin resolver strategy interface (custom similarity algorithms)
+- Parallel rule evaluation for very large haystacks
+- Configurable overlap priority strategies
+- More built-in resolver methods beyond `exact`, `fuzzy`, `contains`
+- Richer IDE tooling (hover docs, go‑to definition)
+
+## Contributing
+
+1. Fork the repo and create a feature branch.
+2. Write tests under `tests/` for new features or bug fixes.
+3. Run `pytest` to ensure all tests pass.
+   ```powershell
+   pytest
+   ```
+4. Submit a pull request.
+
+## License
+
+The OmegaOMG project is licensed under the [Apache License 2.0](LICENSE).
+
+OmegaOMG is **not** an official Apache Software Foundation (ASF) project.
+
+---
+
+Questions or ideas? Open an issue or start a discussion – contributions and feedback are welcome.

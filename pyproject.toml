@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "omega-omg"
+version = "0.2.0"
+description = "Omega Object Matching Grammar (OmegaOMG): DSL and engine for high-performance object/entity matching."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+authors = [
+  { name = "OmegaOMG Authors" }
+]
+keywords = ["dsl", "matching", "entity-resolution", "nlp", "regex", "omega"]
+classifiers = [
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Operating System :: OS Independent",
+  "Topic :: Text Processing",
+]
+dependencies = [
+  "lark",
+  "omega_match",
+]
+
+[project.urls]
+Homepage = "https://github.com/scholarsmate/omega-omg"
+Repository = "https://github.com/scholarsmate/omega-omg"
+Issues = "https://github.com/scholarsmate/omega-omg/issues"
+
+[project.scripts]
+omg = "omg:main"
+omg-highlight = "highlighter:main"
+
+[tool.setuptools]
+include-package-data = true
+py-modules = ["omg", "highlighter"]
+
+[tool.setuptools.packages.find]
+include = ["dsl*"]

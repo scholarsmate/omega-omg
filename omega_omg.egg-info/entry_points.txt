@@ -1,0 +1,3 @@
+[console_scripts]
+omg = omg:main
+omg-highlight = highlighter:main
