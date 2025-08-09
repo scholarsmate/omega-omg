@@ -101,6 +101,11 @@ Requires: Python 3.9+ (uses builtin generics like tuple[str, ...]).
    pytest -q
    ```
 
+    (Optional) VS Code extension:
+
+    - Install the OMG Language Support extension for syntax highlighting and IntelliSense:
+       https://github.com/scholarsmate/omega-omg-vscode
+
     ### Docker (optional)
 
     Prebuilt image (GHCR):
