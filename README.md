@@ -101,85 +101,85 @@ Requires: Python 3.9+ (uses builtin generics like tuple[str, ...]).
    pytest -q
    ```
 
-    (Optional) VS Code extension:
+### VS Code extension (optional)
 
-    - Install the OMG Language Support extension for syntax highlighting and IntelliSense:
-       https://github.com/scholarsmate/omega-omg-vscode
+- Install the Omega OMG Language Support extension for syntax highlighting and IntelliSense:
+   https://github.com/scholarsmate/omega-omg-vscode
 
-    ### Docker (optional)
+### Docker (optional)
 
-    Prebuilt image (GHCR):
+Prebuilt image (GHCR):
 
-    - Pull the image (multi‑arch: amd64/arm64):
+- Pull the image (multi‑arch: amd64/arm64):
 
-       ```bash
-       docker pull ghcr.io/scholarsmate/omega-omg:latest
-       ```
+   ```bash
+   docker pull ghcr.io/scholarsmate/omega-omg:latest
+   ```
 
-    - Run with your workspace mounted (ENTRYPOINT already runs omg.py):
+- Run with your workspace mounted (ENTRYPOINT already runs omg.py):
 
-       ```bash
-       docker run --rm -v "$PWD:/work" -w /work ghcr.io/scholarsmate/omega-omg:latest --help
-       ```
+   ```bash
+   docker run --rm -v "$PWD:/work" -w /work ghcr.io/scholarsmate/omega-omg:latest --help
+   ```
 
-    - Example (Linux/macOS) end‑to‑end run with output:
+- Example (Linux/macOS) end‑to‑end run with output:
 
-       ```bash
-       docker run --rm -v "$PWD:/work" -w /work ghcr.io/scholarsmate/omega-omg:latest \
-          --show-stats --show-timing --output matches.json \
-          ./demo/demo.omg ./demo/CIA_Briefings_of_Presidential_Candidates_1952-1992.txt
-       ```
+   ```bash
+   docker run --rm -v "$PWD:/work" -w /work ghcr.io/scholarsmate/omega-omg:latest \
+       --show-stats --show-timing --output matches.json \
+       ./demo/demo.omg ./demo/CIA_Briefings_of_Presidential_Candidates_1952-1992.txt
+   ```
 
-    - Example (Windows PowerShell):
+- Example (Windows PowerShell):
 
-       ```powershell
-       docker run --rm -v "${PWD}:/work" -w /work ghcr.io/scholarsmate/omega-omg:latest \
-          --show-stats --show-timing --output matches.json \
-          ./demo/demo.omg ./demo/CIA_Briefings_of_Presidential_Candidates_1952-1992.txt
-       ```
+   ```powershell
+   docker run --rm -v "${PWD}:/work" -w /work ghcr.io/scholarsmate/omega-omg:latest \
+       --show-stats --show-timing --output matches.json \
+       ./demo/demo.omg ./demo/CIA_Briefings_of_Presidential_Candidates_1952-1992.txt
+   ```
 
-    Notes:
-    - Inside the Linux container, use POSIX‑style paths (forward slashes), even on Windows.
-    - The image includes the native OpenMP runtime (libgomp) required by omega_match.
-    - Versioned tags are published on release, e.g.: `ghcr.io/scholarsmate/omega-omg:v0.2.1`.
+Notes:
+- Inside the Linux container, use POSIX‑style paths (forward slashes), even on Windows.
+- The image includes the native OpenMP runtime (libgomp) required by omega_match.
+- Versioned tags are published on release, e.g.: `ghcr.io/scholarsmate/omega-omg:v0.2.1`.
 
-      Generate highlighted HTML (using the container):
+#### Generate highlighted HTML (using the container)
 
-      - Linux/macOS:
+- Linux/macOS:
 
-          ```bash
-          # 1) Produce matches.json
-          docker run --rm -v "$PWD:/work" -w /work ghcr.io/scholarsmate/omega-omg:latest \
-             --show-stats --show-timing --output matches.json \
-             ./demo/demo.omg ./demo/CIA_Briefings_of_Presidential_Candidates_1952-1992.txt
+   ```bash
+   # 1) Produce matches.json
+   docker run --rm -v "$PWD:/work" -w /work ghcr.io/scholarsmate/omega-omg:latest \
+       --show-stats --show-timing --output matches.json \
+       ./demo/demo.omg ./demo/CIA_Briefings_of_Presidential_Candidates_1952-1992.txt
 
-          # 2) Render HTML with the highlighter (override entrypoint to run the script)
-          docker run --rm -v "$PWD:/work" -w /work \
-             --entrypoint python ghcr.io/scholarsmate/omega-omg:latest \
-             highlighter.py ./demo/CIA_Briefings_of_Presidential_Candidates_1952-1992.txt matches.json CIA_demo.html
-          ```
+   # 2) Render HTML with the highlighter (override entrypoint to run the script)
+   docker run --rm -v "$PWD:/work" -w /work \
+       --entrypoint python ghcr.io/scholarsmate/omega-omg:latest \
+       highlighter.py ./demo/CIA_Briefings_of_Presidential_Candidates_1952-1992.txt matches.json CIA_demo.html
+   ```
 
-      - Windows PowerShell:
+- Windows PowerShell:
 
-          ```powershell
-          # 1) Produce matches.json
-          docker run --rm -v "${PWD}:/work" -w /work ghcr.io/scholarsmate/omega-omg:latest \
-             --show-stats --show-timing --output matches.json \
-             ./demo/demo.omg ./demo/CIA_Briefings_of_Presidential_Candidates_1952-1992.txt
+   ```powershell
+   # 1) Produce matches.json
+   docker run --rm -v "${PWD}:/work" -w /work ghcr.io/scholarsmate/omega-omg:latest \
+       --show-stats --show-timing --output matches.json \
+       ./demo/demo.omg ./demo/CIA_Briefings_of_Presidential_Candidates_1952-1992.txt
 
-          # 2) Render HTML with the highlighter (override entrypoint to run the script)
-          docker run --rm -v "${PWD}:/work" -w /work --entrypoint python ghcr.io/scholarsmate/omega-omg:latest \
-             highlighter.py ./demo/CIA_Briefings_of_Presidential_Candidates_1952-1992.txt matches.json CIA_demo.html
-          ```
+   # 2) Render HTML with the highlighter (override entrypoint to run the script)
+   docker run --rm -v "${PWD}:/work" -w /work --entrypoint python ghcr.io/scholarsmate/omega-omg:latest \
+       highlighter.py ./demo/CIA_Briefings_of_Presidential_Candidates_1952-1992.txt matches.json CIA_demo.html
+   ```
 
-      This writes `CIA_demo.html` to your current workspace directory for easy viewing.
+This writes `CIA_demo.html` to your current workspace directory for easy viewing.
 
-    Build locally instead:
+Build locally instead:
 
-    ```bash
-    docker build -t omega-omg:latest .
-    docker run --rm -v "$PWD:/work" -w /work omega-omg:latest --help
-    ```
+```bash
+docker build -t omega-omg:latest .
+docker run --rm -v "$PWD:/work" -w /work omega-omg:latest --help
+```
 
 ## Usage
 
