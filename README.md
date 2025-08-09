@@ -98,6 +98,20 @@ Requires: Python 3.9+ (uses builtin generics like tuple[str, ...]).
    pytest -q
    ```
 
+   ### Docker (optional)
+
+   Build a minimal image for deployment or ad‑hoc runs:
+
+   ```bash
+   docker build -t omega-omg:latest .
+   ```
+
+   Run the CLI inside the container (mount your working dir):
+
+   ```bash
+   docker run --rm -v "$PWD:/work" -w /work omega-omg:latest python omg.py --help
+   ```
+
 ## Usage
 
 ### 1. Define a DSL file

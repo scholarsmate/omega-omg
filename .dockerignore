@@ -1,0 +1,24 @@
+# Ignore VCS and local config
+.git
+.gitignore
+
+# Python cache
+__pycache__
+*.py[cod]
+*.egg-info/
+.venv/
+
+# Build artifacts
+build/
+dist/
+.coverage
+coverage.xml
+htmlcov/
+
+# IDE/editor
+.vscode/
+.idea/
+
+# OS cruft
+.DS_Store
+Thumbs.db
