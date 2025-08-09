@@ -1,33 +1,13 @@
 Metadata-Version: 2.4
 Name: omega-omg
-Version: 0.2.0
+Version: 0.2.1
 Summary: Omega Object Matching Grammar (OmegaOMG): DSL and engine for high-performance object/entity matching.
 Author: OmegaOMG Authors
-License:                                  Apache License
-                                   Version 2.0, January 2004
-                                http://www.apache.org/licenses/
-        
-           TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
-        
-           Copyright 2025 Omega Development
-        
-           Licensed under the Apache License, Version 2.0 (the "License");
-           you may not use this file except in compliance with the License.
-           You may obtain a copy of the License at
-        
-               http://www.apache.org/licenses/LICENSE-2.0
-        
-           Unless required by applicable law or agreed to in writing, software
-           distributed under the License is distributed on an "AS IS" BASIS,
-           WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-           See the License for the specific language governing permissions and
-           limitations under the License.
-        
+License-Expression: Apache-2.0
 Project-URL: Homepage, https://github.com/scholarsmate/omega-omg
 Project-URL: Repository, https://github.com/scholarsmate/omega-omg
 Project-URL: Issues, https://github.com/scholarsmate/omega-omg/issues
 Keywords: dsl,matching,entity-resolution,nlp,regex,omega
-Classifier: License :: OSI Approved :: Apache Software License
 Classifier: Programming Language :: Python :: 3
 Classifier: Programming Language :: Python :: 3 :: Only
 Classifier: Programming Language :: Python :: 3.9
@@ -47,7 +27,7 @@ Dynamic: license-file
 # OmegaOMG: Omega Object Matching Grammar
 
 <p align="center">
-  <img src="images/icon.svg" alt="OmegaOMG Logo" width=180/>
+   <img src="https://raw.githubusercontent.com/scholarsmate/omega-omg/main/images/icon.png" alt="OmegaOMG Logo" width="180" />
 </p>
 
 <p align="center">

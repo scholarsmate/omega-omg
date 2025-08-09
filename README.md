@@ -1,7 +1,7 @@
 # OmegaOMG: Omega Object Matching Grammar
 
 <p align="center">
-  <img src="images/icon.svg" alt="OmegaOMG Logo" width=180/>
+   <img src="https://raw.githubusercontent.com/scholarsmate/omega-omg/main/images/icon.png" alt="OmegaOMG Logo" width="180" />
 </p>
 
 <p align="center">

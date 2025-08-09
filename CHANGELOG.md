@@ -19,6 +19,11 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 - Lint (ruff) warnings and mypy typing issues across parser and tests.
 - Resolver tests minor issues (exception handling, indentation).
 
+## [0.2.1] - 2025-08-08
+
+### Fixed
+- PyPI README logo: use absolute PNG URL so the image renders on PyPI.
+
 ## [0.1.0] - 2025-08-01
 
 ### Added

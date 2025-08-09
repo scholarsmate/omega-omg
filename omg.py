@@ -13,7 +13,7 @@ from dsl.omg_evaluator import RuleEvaluator
 from dsl.omg_parser import parse_string, OMG_DSL_VERSION
 from dsl.omg_resolver import EntityResolver
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 # Ensure UTF-8 encoding for stdout
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")

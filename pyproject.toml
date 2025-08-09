@@ -4,17 +4,16 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "omega-omg"
-version = "0.2.0"
+version = "0.2.1"
 description = "Omega Object Matching Grammar (OmegaOMG): DSL and engine for high-performance object/entity matching."
 readme = "README.md"
 requires-python = ">=3.9"
-license = { file = "LICENSE" }
+license = "Apache-2.0"
 authors = [
   { name = "OmegaOMG Authors" }
 ]
 keywords = ["dsl", "matching", "entity-resolution", "nlp", "regex", "omega"]
 classifiers = [
-  "License :: OSI Approved :: Apache Software License",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.9",
