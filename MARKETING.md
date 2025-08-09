@@ -44,6 +44,7 @@ Built on top of [OmegaMatch](https://github.com/scholarsmate/omega-match) for th
 - Resolver methods: `exact` and `fuzzy(threshold=...)`, optional tokens, and case/punctuation normalization.
 - Parent/child modeling: Dotted rules (e.g., `person.surname`) with automatic parent boundary enrichment.
 - JSON output: Clean, line‑delimited JSON or pretty JSON for easy pipelines.
+ - HTML visualization: interactive highlighted HTML via `highlighter.py` for fast review and demos.
 
 ---
 
@@ -98,6 +99,7 @@ person = [[given_name]] ( \s{1,4} [[given_name]] ){0,2} ( \s{1,4} \w | \s{1,4} \
 - Python API: programmatic parsing and evaluation (`dsl.omg_parser`, `dsl.omg_evaluator`)
 - VS Code: syntax highlighting, IntelliSense (link in README)
 - List matching engine: powered by [OmegaMatch](https://github.com/scholarsmate/omega-match)
+ - Highlighter: render interactive HTML from matches (`highlighter.py`)
 
 ---
 
