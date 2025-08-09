@@ -509,8 +509,8 @@ def test_rule_resolver_clause():
     rc = rd.resolver_config
     assert rc.method == "fuzzy"
     assert "ignore-case" in rc.flags
-    # args may include key or value depending on parsing
-    assert rc.args in ((("threshold", '"0.75"'),), ('"0.75"',))
+    # args may include key or value depending on parsing; allow key=value string too
+    assert rc.args in ((("threshold", '"0.75"'),), ('"0.75"',), ('threshold="0.75"',))
 
 
 # === Comprehensive Resolver Tests ===

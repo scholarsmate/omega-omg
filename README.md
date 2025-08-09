@@ -1,26 +1,49 @@
-# OmegaOMG: Omega Object Matching Grammar is a high-performance rule-based object matcher
+# OmegaOMG: Omega Object Matching Grammar
 
 <p align="center">
   <img src="images/icon.svg" alt="OmegaOMG Logo" width=180/>
 </p>
 
-OmegaOMG is a domain-specific language (DSL) and runtime engine for defining and evaluating complex matching rules against large byte-based inputs (“haystacks”). It leverages pre-anchored pattern matches (via the `OmegaMatch` library), advanced AST-based evaluation, and customizable entity resolution to deliver efficient, reliable object extraction pipelines.
+OmegaOMG is a domain-specific language (DSL) and runtime engine for defining and evaluating high‑performance object / entity matching rules against large byte-based inputs (“haystacks”). It leverages pre‑anchored longest, non‑overlapping pattern matches (via the [`OmegaMatch`](https://github.com/scholarsmate/omega-match) library), an optimized AST evaluation engine, and a modular entity resolution pipeline to produce clean, canonicalized, and enriched match streams.
 
-## Features
+## Key Features
 
-- **Expressive DSL syntax**: Write rules using named list matches, literals, escapes, concatenation, alternation, and bounded quantifiers.
-- **Pre-anchored matching**: Integrates with [OmegaMatch](https://github.com/scholarsmate/omega-match) to obtain longest, non-overlapping match streams for each alias.
-- **AST-based evaluation**: Transforms parsed rules into an abstract syntax tree (AST), then evaluates with caching and fast-path optimizations.
-- **Customizable resolvers**: Attach default or per-rule resolver configurations for entity enrichment (e.g., dates, numbers, custom tokens).
-- **Performance optimizations**:
-  - Pre-compiled regex patterns and Lark parser reuse
-  - Typed cache keys and offset-indexed lookup tables
-  - Binary-search anchoring and greedy extension for list matches
-  - Adaptive sampling for quantifier anchors
-- **Zero external dependencies** aside from standard Python libraries and `lark` / `omega_match`.
-- **VSCode Intelisense**: Visual Studio Code OMG Intelisense provided by [OMG Language Support](https://github.com/scholarsmate/omega-omg-vscode)
+- **Expressive DSL** (version `1.0`):
+   - `version 1.0` header (mandatory)
+   - `import "file.txt" as alias [with flags...]`
+   - Pattern atoms: literals, escapes (`\d \s \w` etc.), anchors `^ $`, dot `.`, character classes `[...]`, list matches `[[alias]]`, optional filters `[[alias:startsWith("A")]]`, named captures `(?P<name> ...)`.
+   - Operators: concatenation, alternation `|`, grouping `(...)`.
+   - Quantifiers: bounded `{m}`, `{m,n}`, and `?` (no unbounded `*` / `+` – enforced at runtime).
+   - Every rule must include at least one `ListMatch` anchor (validated).
+   - Dotted rule names (e.g. `person.surname`) supported for parent/child entity models.
+- **Import flags**: `ignore-case`, `ignore-punctuation`, `elide-whitespace`, `word-boundary`, `word-prefix`, `word-suffix`, `line-start`, `line-end` (forwarded to `omega_match`).
+- **Pre‑anchored matching**: Delegates raw token list detection to `omega_match` with `longest_only` & `no_overlap` guarantees per alias.
+- **Optimized AST evaluation**:
+   - Offset‑indexed & binary searched ListMatch anchors
+   - Greedy quantified ListMatch chaining
+   - Caching for pattern parts, prefix length, listmatch presence, unbounded checks
+   - Adaptive sampling of potential start offsets to dramatically reduce scan points
+- **Entity Resolution Pipeline** (see `RESOLUTION.md`): Implements Steps 1‑6
+   1. Validation & normalization
+   2. Overlap resolution with deterministic tie‑breaking
+   3. Tokenization + optional token filtering
+   4. Horizontal canonicalization (parent deduplication)
+   5. Vertical child resolution (child → parent referencing)
+   6. Metadata enrichment (sentence / paragraph boundaries)
+- **Resolver configuration**:
+   - `resolver default uses exact ...` sets a default for rules
+   - Per‑rule: `rule = ... uses resolver fuzzy(threshold="0.9") with ignore-case, optional-tokens("file.txt")`
+   - Parent rules without children skip resolution for speed; parents with children receive an automatic lightweight `boundary-only` resolver if not explicitly configured.
+- **Resolver methods**: Grammar accepts arbitrary resolver method identifiers; built-ins implemented are `exact` and `fuzzy(threshold=...)`. For parent canonicalization, unknown methods fall back to `exact`. For child resolution, use `exact` or `fuzzy` to guarantee matching; unknown methods may result in children being discarded. An internal `boundary-only` mode is used automatically for certain parent rules.
+- **Highlighter utility**: Renders enriched matches to interactive HTML (`highlighter.py`) with rule toggles and keyboard navigation (`n` / `p`).
+- **VS Code language integration**: See [OMG Language Support](https://github.com/scholarsmate/omega-omg-vscode) for syntax highlighting & IntelliSense.
+- **Lean dependencies**: Runtime requires only `lark` and `omega_match`.
+
+> For algorithmic details and performance rationale see: [`RESOLUTION.md`](RESOLUTION.md)
 
 ## Installation
+
+Requires: Python 3.9+ (uses builtin generics like tuple[str, ...]).
 
 1. Clone this repository:
 
@@ -45,10 +68,18 @@ OmegaOMG is a domain-specific language (DSL) and runtime engine for defining and
    source ./.venv/bin/activate
    ```
 
-3. In the activated environment, install requirements:
+3. Install runtime dependencies (and optionally dev tooling):
 
-   ```shell
+   ```powershell
    pip install -r requirements.txt
+   # For contributors / tests / linting
+   pip install -r requirements-dev.txt
+   ```
+
+4. (Optional) Run tests to verify environment:
+
+   ```powershell
+   pytest -q
    ```
 
 ## Usage
@@ -90,7 +121,7 @@ phone = "(" \s{0,2} \d{3} \s{0,2} ")" \s{0,2} \d{3} "-" \s{0,2} [[4_digits]]
 # Pattern: username@domain.tld
 # Username: 1-64 chars (alphanumeric, dots, hyphens, underscores)
 # Domain: 1-253 chars total, each label 1-63 chars
-email = [a-zA-Z0-9._-]{1,64} "@" [a-zA-Z0-9-]{1,63} ("." [a-zA-Z0-9-]{1,63}){0,10} "." [[tld]]
+email = [A-Za-z0-9._-]{1,64} "@" [A-Za-z0-9-]{1,63} ("." [A-Za-z0-9-]{1,63}){0,10} "." [[tld]]
 ```
 
 ### 2. Parse and evaluate in Python
@@ -113,13 +144,37 @@ for m in matches:
 
 ### 3. Command-Line Tool
 
-A command-line interface for batch processing is provided by `omg.py`. Run `python omg.py --help` for options.
+A command-line interface is provided by `omg.py`.
+
+```powershell
+python omg.py --help
+```
+
+Common flags:
+
+| Flag | Purpose |
+|------|---------|
+| `--show-stats` | Emit resolution statistics (input vs output, stage timings) |
+| `--show-timing` | Show breakdown of file load, parse, evaluation, resolution |
+| `--no-resolve` | Skip entity resolution; emit raw rule matches |
+| `--pretty-print` | Emit a single JSON array instead of line-delimited JSON objects |
+| `--log-level LEVEL` | Adjust logging (default WARNING) |
+| `-o file.json` | Write JSON output to file (UTF‑8, LF) |
+| `--version` | Show component & DSL versions |
+
+Version output example:
+```
+Version information:
+   omega_match: <x.y.z>
+   omg: 0.1.0
+   DSL: 1.0
+```
 
 #### Demo: End-to-End Object Matching and Highlighting
 
 The following demonstrates how to use the CLI tools to extract and visualize matches from a text file using a demo OMG rule set:
 
-1. **Run the matcher and output results to JSON:**
+1. **Run the matcher and output results to JSON (line‑delimited):**
 
    ```powershell
    python omg.py --show-stats --show-timing --output matches.json .\demo\demo.omg .\demo\CIA_Briefings_of_Presidential_Candidates_1952-1992.txt
@@ -138,13 +193,85 @@ You can open the resulting HTML file in a browser to visually inspect the extrac
 ## Project Structure
 
 ```
-omg.py            # Object Matching Grammar CLI tool for running .omg files
-highlighter.py    # Given found objects and the haystack, create a highlighted HTML
-dsl/              # DSL parser, AST, transformer, evaluator, and resolver logic
-resolver/         # Built-in resolver modules for entity enrichment
-demo/             # Example rules and input files
-tests/            # Unit and integration tests (pytest)
+omg.py               # CLI driver (evaluate + optional resolution + JSON output)
+highlighter.py       # Convert line-delimited match JSON to interactive HTML
+dsl/
+   omg_grammar.lark   # Lark grammar definition for DSL v1.0
+   omg_parser.py      # Parser + resolver clause extraction + version enforcement
+   omg_ast.py         # Immutable AST node dataclasses
+   omg_transformer.py # Grammar → AST transformer
+   omg_evaluator.py   # Optimized rule evaluation engine
+   omg_resolver.py    # Resolver façade (imports components below)
+   resolver/          # Entity resolution submodules (overlap, horizontal, vertical, tokenizer, metadata)
+demo/                # Example DSL + pattern lists + sample text
+tests/               # Comprehensive pytest suite
+RESOLUTION.md        # Detailed entity resolution algorithm spec
 ```
+
+## DSL Constraints & Gotchas
+
+- All rules must include at least one `[[alias]]` (ListMatch). Pure literal / regex‑like rules are rejected.
+- Unbounded quantifiers (`*`, `+`) are disallowed; use `{0,n}` / `{1,n}` equivalents.
+- Quantified `ListMatch` chains are greedily extended with adjacency (no gaps) and optional line boundary enforcement.
+- Dotted (child) rules without an explicit resolver inherit the default; parents with children but no explicit resolver receive a lightweight `boundary-only` config to add structural metadata.
+- Import paths in a DSL file are resolved relative to that DSL file when relative.
+
+## Entity Resolution Summary
+
+After raw AST evaluation, resolution (unless `--no-resolve`) applies:
+
+1. Overlap removal (length > earlier offset > shorter rule name > lexical rule name).
+2. Parent canonicalization by normalized token bag (flags + optional tokens removed).
+3. Child rule validation: each child must map to exactly one canonical parent (else dropped).
+4. Metadata enrichment: sentence & paragraph boundary offsets.
+
+See `RESOLUTION.md` for full reasoning, complexity, and future extension recommendations.
+
+## Performance Notes
+
+- Matching cost reduced via adaptive anchor sampling and per‑alias offset maps.
+- Regex-like escapes use pre‑compiled single‑byte patterns for speed.
+- Caches (pattern part, prefix length, ListMatch presence, unbounded quantifier detection) materially cut repeated traversals.
+- Resolution skips unnecessary work (e.g., no resolver for isolated parent rules).
+
+## Development
+
+Formatting / linting (optional but recommended):
+
+```powershell
+ruff check .
+pylint dsl omg.py highlighter.py
+pytest --cov
+```
+
+Type checking:
+```powershell
+mypy dsl
+```
+
+Releasing (example):
+```powershell
+python -m build
+twine upload dist/*
+```
+
+## Troubleshooting
+
+| Issue | Likely Cause | Fix |
+|-------|--------------|-----|
+| `ValueError: Rule 'x' must include at least one list match` | Rule lacks `[[alias]]` | Add an import + list match anchor |
+| `Unsupported OMG DSL version` | DSL file version mismatch | Update `version 1.0` or engine constant |
+| No matches produced | Missing import flags (e.g. `word-boundary`) or list file path issue | Verify list file contents & flags |
+| Child rules disappear | Unresolved parent reference | Ensure corresponding parent rule matches same span |
+| HTML missing colors for a rule | Rule produced zero matches | Confirm JSON lines include that rule |
+
+## Roadmap (Planned / Potential)
+
+- Plugin resolver strategy interface (custom similarity algorithms)
+- Parallel rule evaluation for very large haystacks
+- Configurable overlap priority strategies
+- More built-in resolver methods beyond `exact`, `fuzzy`, `contains`
+- Richer IDE tooling (hover docs, go‑to definition)
 
 ## Contributing
 
@@ -160,4 +287,8 @@ tests/            # Unit and integration tests (pytest)
 
 The OmegaOMG project is licensed under the [Apache License 2.0](LICENSE).
 
-OmegaOMG is not an official Apache Software Foundation (ASF) project.
+OmegaOMG is **not** an official Apache Software Foundation (ASF) project.
+
+---
+
+Questions or ideas? Open an issue or start a discussion – contributions and feedback are welcome.

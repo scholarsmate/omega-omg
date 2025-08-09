@@ -119,7 +119,7 @@ def parse_string(
             method_part = parts[0]
             flags_part = parts[1] if len(parts) > 1 else ""
             method = method_part.split("(")[0].strip()
-            args = tuple(
+            default_args = tuple(
                 a.split("=", 1)[0].strip()
                 for a in RE_FLAG_SPLIT.split(
                     method_part[method_part.find("(") + 1 : method_part.rfind(")")]
@@ -129,23 +129,23 @@ def parse_string(
                 if a.strip()
             )
             # Extract optional-tokens and flags only once
-            optional = tuple(
+            default_optional = tuple(
                 tok.strip().strip('"')
                 for match in RE_OPTIONAL_TOKENS.findall(flags_part)
                 for tok in match.split(",")
                 if tok.strip()
             )
             flags_part_clean = RE_OPTIONAL_TOKENS.sub("", flags_part)
-            flags = tuple(
+            default_flags = tuple(
                 flag
                 for flag in RE_FLAG_SPLIT.split(flags_part_clean)
                 if flag.strip() and flag.strip() in RE_VALID_FLAGS
             )
             default_resolver = ResolverDefault(
                 method=method,
-                args=args,
-                flags=flags,
-                optional_tokens=optional,
+                args=default_args,
+                flags=default_flags,
+                optional_tokens=default_optional,
             )
 
         # Process per-rule resolvers and create new rules with resolver configs
@@ -158,7 +158,7 @@ def parse_string(
                 if method_part.startswith("resolver "):
                     method_part = method_part[len("resolver ") :].strip()
                 flags_part = parts[1] if len(parts) > 1 else ""
-                args = []
+                rule_args: list[str] = []
                 if "(" in method_part:
                     inner = method_part[
                         method_part.find("(") + 1 : method_part.rfind(")")
@@ -166,24 +166,24 @@ def parse_string(
                     for a in RE_FLAG_SPLIT.split(inner):
                         if "=" in a:
                             k, v = a.split("=", 1)
-                            args.append((k.strip(), v.strip()))
+                            rule_args.append(f"{k.strip()}={v.strip()}")
                         elif a.strip():
-                            args.append(a.strip())
+                            rule_args.append(a.strip())
                 method = method_part.split("(")[0].strip()
                 # Extract optional-tokens and flags only once
-                optional = tuple(
+                rule_optional = tuple(
                     tok.strip().strip('"')
                     for match in RE_OPTIONAL_TOKENS.findall(clause)
                     for tok in match.split(",")
                     if tok.strip()
                 )
                 flags_clean = RE_OPTIONAL_TOKENS.sub("", flags_part)
-                flags = tuple(RE_EXTRACT_FLAGS.findall(flags_clean))
+                rule_flags = tuple(RE_EXTRACT_FLAGS.findall(flags_clean))
                 resolver_config = ResolverConfig(
                     method=method,
-                    args=tuple(args),
-                    flags=flags,
-                    optional_tokens=optional,
+                    args=tuple(rule_args),
+                    flags=rule_flags,
+                    optional_tokens=rule_optional,
                 )
                 updated_rule = RuleDef(
                     name=rule.name,

@@ -18,8 +18,11 @@ from .omg_ast import (
     Alt,
     Concat,
     Escape,
+    Dot,
     LineEnd,
     LineStart,
+    CharClass,
+    CharRange,
     ListMatch,
     ListMatchResult,
     Literal,
@@ -523,6 +526,24 @@ class RuleEvaluator:
                     m_inner._ast_node = node_to_match
                     results.append(m_inner)
 
+        elif node_type is Dot:
+            # Dot matches any single non-newline byte
+            if offset < self.haystack_len:
+                nxt = self.haystack[offset : offset + 1]
+                if nxt not in NEWLINE_BYTES:
+                    res = MatchResult(offset=offset, match=nxt)
+                    res._ast_node = part_ast_node
+                    res._constituent_matches = []
+                    results.append(res)
+
+        elif node_type is CharClass:
+            cc_results = self._match_charclass(node_to_match, offset)
+            if cc_results:
+                for res in cc_results:
+                    res._ast_node = part_ast_node
+                    res._constituent_matches = []
+                    results.append(res)
+
         elif node_type is ListMatch:
             alias = node_to_match.name
             alias_offset_map = self._offset_indexed_cache.get(alias)
@@ -562,6 +583,54 @@ class RuleEvaluator:
                         results.append(qres)
 
         self._pattern_cache[cache_key] = results
+        return results
+
+    def _match_charclass(self, node: CharClass, offset: int) -> List[MatchResult]:
+        """Match a character class node at the given offset. Returns a 1-byte match if any part matches."""
+        results: List[MatchResult] = []
+        if offset >= self.haystack_len:
+            return results
+        b = self.haystack[offset : offset + 1]
+        b_int = self.haystack[offset]
+
+        def matches_escape(val: str) -> bool:
+            # val is like 'd','D','s','S','w','W','.',']','[','-','\\' (without the leading slash)
+            # Use existing ESCAPE_PATTERNS where applicable (single-byte match)
+            if val in ESCAPE_PATTERNS:
+                pat = ESCAPE_PATTERNS[val]
+                return bool(pat.match(self.haystack, offset, offset + 1))
+            # Unsupported escapes in char class (e.g., \b, \B) - treat as non-match
+            return False
+
+        def matches_char(c: str) -> bool:
+            return b_int == ord(c)
+
+        def matches_range(r: CharRange) -> bool:
+            start = ord(r.start)
+            end = ord(r.end)
+            if start <= b_int <= end:
+                return True
+            return False
+
+        # If any part matches, the class matches
+        for part in node.parts:
+            if isinstance(part, CharRange):
+                if matches_range(part):
+                    results.append(MatchResult(offset=offset, match=b))
+                    break
+            elif isinstance(part, Escape):
+                val = part.value
+                if val.startswith("\\"):
+                    val = val[1:]
+                if matches_escape(val):
+                    results.append(MatchResult(offset=offset, match=b))
+                    break
+            else:
+                # Raw character inside the class
+                if isinstance(part, str) and len(part) == 1 and matches_char(part):
+                    results.append(MatchResult(offset=offset, match=b))
+                    break
+
         return results
 
     def _match_escape(self, part_ast_node: Any, offset: int) -> List[MatchResult]:
@@ -994,6 +1063,8 @@ class RuleEvaluator:
             length = len(part.value.encode("utf-8"))
             return length, length
         elif isinstance(part, Escape):
+            return 1, 1
+        elif isinstance(part, (Dot, CharClass)):
             return 1, 1
         elif isinstance(part, ListMatch):
             # Assume reasonable bounds for list matches

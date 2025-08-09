@@ -875,7 +875,7 @@ class TestAdvancedCoverageTargets:
         try:
             # Force re-import to trigger fallback path
             importlib.reload(sys.modules["dsl.omg_evaluator"])
-        except:
+        except Exception:
             pass  # Expected to potentially fail in test environment
         finally:
             # Restore original state
