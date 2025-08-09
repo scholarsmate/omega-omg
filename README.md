@@ -176,7 +176,7 @@ Version output example:
 ```
 Version information:
    omega_match: <x.y.z>
-   omg: 0.1.0
+   omg: 0.2.0
    DSL: 1.0
 ```
 

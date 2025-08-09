@@ -6,25 +6,35 @@ import json
 import logging
 import sys
 import time
-from typing import Dict
+from typing import Dict, List, Optional, TypedDict, Any, Tuple, cast
 
 from omega_match.omega_match import get_version
 from dsl.omg_evaluator import RuleEvaluator
 from dsl.omg_parser import parse_string, OMG_DSL_VERSION
 from dsl.omg_resolver import EntityResolver
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 # Ensure UTF-8 encoding for stdout
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
 
 
+class _StageInfo(TypedDict):
+    stage: str
+    current: int
+    total: int
+    timestamp: float
+
+
 def show_resolution_statistics(
-    progress_data: Dict, input_matches: int, output_matches: int, rule_match_counts: dict = None
+    progress_data: Dict[str, Any],
+    input_matches: int,
+    output_matches: int,
+    rule_match_counts: Optional[Dict[str, int]] = None,
 ):
     """Display detailed resolution statistics."""
     total_time = time.time() - progress_data["start_time"]
-    stages = progress_data.get("stages", [])
+    stages: List[_StageInfo] = cast(List[_StageInfo], progress_data.get("stages", []))
 
     sys.stderr.write("=== Resolution Statistics ===\n")
     sys.stderr.write(f"Total processing time: {total_time:.2f} seconds\n")
@@ -41,7 +51,7 @@ def show_resolution_statistics(
 
     if stages:
         sys.stderr.write("\nStage breakdown:\n")
-        stage_times = {}
+        stage_times: Dict[str, List[float]] = {}
         for i, stage_info in enumerate(stages):
             stage = stage_info["stage"]
             timestamp = stage_info["timestamp"]
@@ -158,25 +168,27 @@ def main():
 
     rules = ast_root.rules
 
-    all_matches = []
+    all_matches: List[Any] = []
 
     # Time rule evaluation
     eval_start_time = time.time()
 
     # First, evaluate all rules to get raw matches
-    rule_timings = []
+    rule_timings: List[Tuple[str, float, int]] = []
     for rule in rules:
         rule_start_time = time.time()
         if args.quiet:
             results = evaluator.evaluate_rule(rule)
         else:
 
-            def _status_callback(idx, total, rn=rule.name):
+            def _status_callback(idx: int, total: int, rn: str = rule.name) -> None:
                 pct = (idx / total * 100) if total else 0
                 sys.stderr.write(f"\rEvaluating: {rn}: {idx}/{total} ({pct:.1f}%)")
                 sys.stderr.flush()
 
-            results = evaluator.evaluate_rule(rule, progress_callback=_status_callback)
+            results: List[Any] = evaluator.evaluate_rule(
+                rule, progress_callback=_status_callback
+            )
             sys.stderr.write("\n")
         rule_end_time = time.time()
         rule_timings.append((rule.name, rule_end_time - rule_start_time, len(results)))
@@ -192,8 +204,8 @@ def main():
         sys.stderr.write("=============================\n\n")
 
     # Convert RuleMatch objects to dictionary format expected by resolver
-    match_dicts = []
-    rule_match_counts = {}
+    match_dicts: List[Dict[str, Any]] = []
+    rule_match_counts: Dict[str, int] = {}
     for rule_match in all_matches:
         match_dict = {
             "offset": rule_match.offset,
@@ -206,20 +218,20 @@ def main():
 
     if args.no_resolve:
         # Skip resolution and use raw matches
-        output = []
+        output: List[Dict[str, Any]] = []
         for match_dict in match_dicts:
             output.append(match_dict)
 
         sys.stderr.write(f"Found {len(output)} raw matches across {len(rules)} rules\n")
         # Create dummy progress_data for stats if needed
         if args.show_stats:
-            dummy_progress_data = {"stages": [], "start_time": overall_start_time}
+            dummy_progress_data: Dict[str, Any] = {"stages": [], "start_time": overall_start_time}
             show_resolution_statistics(
                 dummy_progress_data, len(match_dicts), len(output), rule_match_counts
             )
     else:
         # Extract resolver configuration from AST
-        resolver_config = {}
+        resolver_config: Dict[str, Any] = {}
         for rule in ast_root.rules:
             if hasattr(rule, "resolver_config") and rule.resolver_config:
                 resolver_config[rule.name] = rule.resolver_config
@@ -231,9 +243,9 @@ def main():
         # Track resolution progress and timing
         resolve_start_time = time.time()
         start_time = time.time()
-        progress_data = {"stages": [], "start_time": start_time}
+        progress_data: Dict[str, Any] = {"stages": [], "start_time": start_time}
 
-        def progress_callback(stage: str, current: int, total: int):
+        def progress_callback(stage: str, current: int, total: int) -> None:
             """Progress callback for EntityResolver."""
             if not args.quiet:
                 pct = (current / total * 100) if total else 0
@@ -269,7 +281,7 @@ def main():
             sys.stderr.write("\n")
 
         # Show detailed statistics if requested
-        output = []
+        output: List[Dict[str, Any]] = []
         if args.show_stats:
             show_resolution_statistics(
                 progress_data, len(match_dicts), len(resolved_matches), rule_match_counts
